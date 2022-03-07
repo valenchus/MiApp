@@ -8,6 +8,7 @@ const Pagination = ({ onPrevious, onNext }) => {
   const handleNext = () => {
     onNext();
   };
+  //nothing
   return (
     <nav>
       <ul>
