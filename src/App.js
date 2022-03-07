@@ -1,25 +1,41 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
 
-function App() {
+import Header from "./components/Header/Header";
+import { gql, useQuery } from "@apollo/client";
+import Characters from "./components/Characters/Characters";
+import { Fragment } from "react";
+import { Pagination } from "@mui/material";
+
+const ALL_CHARACTERS = gql`
+  query GetCharacters {
+    characters {
+      results {
+        id
+        name
+        image
+        status
+        species
+        type
+        gender
+      }
+    }
+  }
+`;
+export default function App() {
+  const { data, error, loading } = useQuery(ALL_CHARACTERS);
+  if (error) return <p> error...</p>;
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>Bookkeeper</h1>
+      {loading ? (
+        <p>loading...</p>
+      ) : (
+        <Fragment>
+          <Pagination />
+          <Characters characters={data?.characters.results} />
+        </Fragment>
+      )}
+      <Header />
     </div>
   );
 }
-
-export default App;
