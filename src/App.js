@@ -13,17 +13,18 @@ const ALL_CHARACTERS = gql`
         id
         name
         image
-        status
-        species
-        type
-        gender
+      }
+      info {
+        pages
       }
     }
   }
 `;
+
 export default function App() {
   const { data, error, loading } = useQuery(ALL_CHARACTERS);
   if (error) return <p> error...</p>;
+  console.log(data);
   return (
     <div>
       <h1>Bookkeeper</h1>
@@ -31,7 +32,7 @@ export default function App() {
         <p>loading...</p>
       ) : (
         <Fragment>
-          <Pagination />
+          <Pagination count={data.characters.info.pages} />
           <Characters characters={data?.characters.results} />
         </Fragment>
       )}

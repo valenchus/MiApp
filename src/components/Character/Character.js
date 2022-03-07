@@ -1,15 +1,82 @@
-import React from "react";
-import { Card, CardHeader, CardMedia, Typography } from "@mui/material";
+import React, { Fragment } from "react";
+import {
+  Card,
+  CardHeader,
+  CardMedia,
+  Pagination,
+  Typography,
+} from "@mui/material";
+import { useParams } from "react-router-dom";
+import { gql, useLazyQuery, useQuery } from "@apollo/client";
+import Characters from "../Characters/Characters";
+import { CharacterStyles } from "./CharacterStyles";
 
-export const Character = ({ character }) => {
-  console.log(character);
+const CHARACTER_BY_ID = gql`
+  query getCharacterById($id: ID!) {
+    character(id: $id) {
+      name
+      status
+      species
+      image
+    }
+  }
+`;
+const PAGE_BY_NUMBER = gql`
+  query pageByNumber($page: Int!) {
+    characters(page: $page) {
+      results {
+        name
+      }
+    }
+  }
+`;
+
+export const Character = () => {
+  const classes = CharacterStyles();
+  const { id } = useParams();
+  const { data, error, loading } = useQuery(CHARACTER_BY_ID, {
+    variables: { id },
+  });
+  const { charactersByPage, errorPage, loadingPage } = useQuery(
+    PAGE_BY_NUMBER,
+    { variables: 3 }
+  );
+  console.log({ charactersByPage });
+  // const { character = {} } = data; rompe
+  // const { name = "Unkwnown name", status = "nothing" } = character;
+  if (error) return <p> error...</p>;
+  console.log(data);
+
   return (
-    <Card sx={{ maxWidth: 345 }}>
-      <CardHeader title={character.name} />
-      <CardMedia component="img" height="194" image={character.image} alt="" />
-      <Typography paragraph>
-        {character.status} {character.species} {character.type}{" "}
-      </Typography>
-    </Card>
+    <div>
+      {loading ? (
+        <p>loading...</p>
+      ) : (
+        <div className={classes.card}>
+          <Card>
+            <CardHeader title={data.character.name} />
+            <CardMedia component="img" image={data.character.image} alt="" />
+            <Typography
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+              }}
+              paragraph
+            >
+              Status: {data.character.status}{" "}
+            </Typography>
+            <Typography
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+              }}
+              paragraph
+            >
+              Specie: {data.character.species}{" "}
+            </Typography>
+          </Card>
+        </div>
+      )}
+    </div>
   );
 };

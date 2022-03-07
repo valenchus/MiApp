@@ -35,7 +35,7 @@ render(
         <Route path={routes.MY_LIKES} element={<MyLikes />}></Route>
         <Route path={routes.PORTFOLIO} element={<Portfolio />}></Route>
         <Route path={routes.WHAT_I_DO} element={<WhatIDo />}></Route>
-        <Route path={routes.CHARACTER} element={<Character />}></Route>
+        <Route path="characters/:id" element={<Character />}></Route>
       </Routes>
     </BrowserRouter>
   </ApolloProvider>,
