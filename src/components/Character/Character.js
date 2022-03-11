@@ -21,31 +21,20 @@ const CHARACTER_BY_ID = gql`
     }
   }
 `;
-const PAGE_BY_NUMBER = gql`
-  query pageByNumber($page: Int!) {
-    characters(page: $page) {
-      results {
-        name
-      }
-    }
-  }
-`;
 
 export const Character = () => {
   const classes = CharacterStyles();
   const { id } = useParams();
   const { data, error, loading } = useQuery(CHARACTER_BY_ID, {
-    variables: { id },
+    variables: { id: id },
   });
-  const { charactersByPage, errorPage, loadingPage } = useQuery(
-    PAGE_BY_NUMBER,
-    { variables: 3 }
-  );
-  console.log({ charactersByPage });
+  console.log({ id });
+  console.log({ data });
+
   // const { character = {} } = data; rompe
   // const { name = "Unkwnown name", status = "nothing" } = character;
   if (error) return <p> error...</p>;
-  console.log(data);
+  // console.log({ data });
 
   return (
     <div>

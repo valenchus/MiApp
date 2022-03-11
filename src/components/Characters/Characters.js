@@ -1,44 +1,88 @@
-import React from "react";
-import { Card, CardHeader, CardMedia } from "@mui/material";
-import { Character } from "../Character/Character";
-import { Link, useNavigate } from "react-router-dom";
-import routes from "../../routes";
+import React, { Fragment, useEffect, useState } from "react";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardMedia,
+  Pagination,
+  Typography,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { CharacterStyles } from "../Character/CharacterStyles";
+import { gql, useQuery } from "@apollo/client";
+import { AppPagination } from "../Pagination/AppPagination";
+import { Character } from "../Character/Character";
 
-export const Characters = ({ characters }) => {
-  const classes = CharacterStyles();
+const CHARACTERS_BY_PAGE = gql`
+  query Character($page: Int) {
+    characters(page: $page) {
+      results {
+        id
+        name
+        image
+      }
+      info {
+        pages
+      }
+    }
+  }
+`;
+export const Characters = () => {
+  const [page, setPage] = useState(0);
+  const [chars, setChars] = useState([]);
+  const [number, setNumber] = useState(0);
+  useEffect(() => {});
+  const { data, error, loading } = useQuery(CHARACTERS_BY_PAGE, {
+    variables: { page },
+  });
   const navigate = useNavigate();
+  //
+  if (error) return <p> error...</p>;
+  const classes = CharacterStyles();
+  const handleButton = () => {
+    console.log("jolis");
+  };
   const getCharacterInfo = (id) => {
     navigate(`characters/${id}`);
     //redirecciona con un id
   };
-  if (characters === null) return null;
-  console.log(characters);
   return (
     <div>
-      <h1> personajes: </h1>
-      {characters.map((character) => (
-        <div key={character.id} className={classes.cards}>
-          {/*<Card>*/}
-          {/*  <img src={character.image} alt="" />*/}
-          {/*</Card>*/}
-          <Card
-            sx={{ maxWidth: 600 }}
+      {loading ? (
+        <p>CARGANDO....</p>
+      ) : (
+        <Fragment>
+          <Button
             onClick={() => {
-              getCharacterInfo(character.id);
+              handleButton();
             }}
           >
-            <CardHeader title={character.name} />
-            <CardMedia
-              component="img"
-              height="250"
-              image={character.image}
-              alt=""
-            />
-          </Card>
-        </div>
-      ))}
+            hola
+          </Button>
+          {data?.characters.results.map((character) => {
+            return (
+              <Card
+                key={character.id}
+                sx={{ maxWidth: 345 }}
+                onClick={() => {
+                  getCharacterInfo(character.id);
+                }}
+              >
+                <CardHeader title={character.name} />
+                <CardMedia
+                  component="img"
+                  height="194"
+                  image={character.image}
+                />
+              </Card>
+            );
+          })}
+          <AppPagination page={data.characters.info.pages} setPage={setPage} />
+        </Fragment>
+      )}
     </div>
+    // <AppPagination count={data.characters.info.pages} />
   );
 };
 export default Characters;
