@@ -3,7 +3,6 @@ import {
   Card,
   CardHeader,
   CardMedia,
-  Pagination,
   Typography,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
@@ -28,13 +27,10 @@ export const Character = () => {
   const { data, error, loading } = useQuery(CHARACTER_BY_ID, {
     variables: { id: id },
   });
-  console.log({ id });
-  console.log({ data });
 
   // const { character = {} } = data; rompe
   // const { name = "Unkwnown name", status = "nothing" } = character;
   if (error) return <p> error...</p>;
-  // console.log({ data });
 
   return (
     <div>

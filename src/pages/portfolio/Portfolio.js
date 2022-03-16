@@ -1,40 +1,33 @@
 import { gql, useLazyQuery, useQuery } from "@apollo/client";
 import React, { Fragment } from "react";
-import { Button } from "@mui/material";
+import {Box, Button, Grid, Paper} from "@mui/material";
+import {styled} from "@mui/styles";
 
-const CHARACTER = gql`
-  query getCharacterByID {
-    character(id: "2") {
-      name
-      image
-    }
-  }
-`;
 const Portfolio = () => {
-  // const { data, error, loading } = useQuery(CHARACTER);
-  const [getCharacters, { data, error, loading }] = useLazyQuery(CHARACTER);
-  const handleButton = () => {
-    console.log("boton");
-    getCharacters();
-    console.log(data);
-  };
-  if (error) return <p> error...</p>;
+
+  const Item = styled(Paper)(({ theme }) => ({
+    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+    ...theme.typography.body2,
+    padding: theme.spacing(1),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+  }));
+
   return (
-    <div>
-      {loading ? (
-        <p>Cargandoo</p>
-      ) : (
-        <Fragment>
-          <Button
-            onClick={() => {
-              handleButton();
-            }}
-          >
-            Cambiar numero
-          </Button>
-        </Fragment>
-      )}
-    </div>
+      <Grid sx={{background: "black", height: "800px"}} container spacing={2}>
+        <Grid item xs={8}>
+          <Box sx={{background: "red"}}>xs=8</Box>
+        </Grid>
+        <Grid item xs={4}>
+          <Box sx={{background: "blue"}}>xs=4</Box>
+        </Grid>
+        <Grid item xs={4}>
+          <Box sx={{background: "yellow"}}>xs=4</Box>
+        </Grid>
+        <Grid item xs={8}>
+          <Box sx={{background: "lightblue"}}>xs=8</Box>
+        </Grid>
+      </Grid>
   );
 };
 export default Portfolio;

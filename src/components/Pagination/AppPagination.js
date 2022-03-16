@@ -31,7 +31,7 @@ export const AppPagination = ({ page, setPage }) => {
       <div className={classes.root}>
         <Pagination
           onChange={(e) => {
-            handleChange(e.target.textContent); //id
+            handleChange(+e.target.textContent); //id
           }}
           style={{ display: "flex", justifyContent: "center" }}
           variant="outlined"

@@ -2,21 +2,18 @@ import React, { Fragment, useEffect, useState } from "react";
 import {
   Button,
   Card,
-  CardContent,
   CardHeader,
   CardMedia,
-  Pagination,
-  Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { CharacterStyles } from "../Character/CharacterStyles";
-import { gql, useQuery } from "@apollo/client";
+import {gql, useLazyQuery, useQuery} from "@apollo/client";
 import { AppPagination } from "../Pagination/AppPagination";
-import { Character } from "../Character/Character";
+import {CharactersStyles} from "./CharactersStyles";
 
 const CHARACTERS_BY_PAGE = gql`
-  query Character($page: Int) {
-    characters(page: $page) {
+  query Character($page: Int, $nameFilter: String) {
+    characters(page: $page, filter: { name: $nameFilter }) {
       results {
         id
         name
@@ -28,43 +25,61 @@ const CHARACTERS_BY_PAGE = gql`
     }
   }
 `;
+const FILTER_CHARACTERS = gql`
+query FilterCharacter($page: Int, $name: String){
+  characters(page: $page, filter: {name: $name}){
+    results{
+    id
+      name
+      image
+      status
+    }
+    info {
+      pages
+    }
+  }
+}
+`; // deberia pasarle page y name
 export const Characters = () => {
-  const [page, setPage] = useState(0);
-  const [chars, setChars] = useState([]);
-  const [number, setNumber] = useState(0);
-  useEffect(() => {});
-  const { data, error, loading } = useQuery(CHARACTERS_BY_PAGE, {
-    variables: { page },
-  });
+  //searchbar
+
+  const [page, setPage] = useState(1);
+  const [searchValue, setSearchValue] = useState("");
+  const [getCharacters, {data, error, loading}] = useLazyQuery(CHARACTERS_BY_PAGE); //sacar
+  const [queryFilter, {data: dataQuery, error: errorQuery, loading: loadingQuery }] = useLazyQuery(FILTER_CHARACTERS); //agregar page
+
+  const classes = CharactersStyles();
+  console.log({dataQuery});
+  useEffect(()=>{
+      queryFilter({variables:{ page }});
+  },[page])
   const navigate = useNavigate();
-  //
+
   if (error) return <p> error...</p>;
-  const classes = CharacterStyles();
-  const handleButton = () => {
-    console.log("jolis");
-  };
+
   const getCharacterInfo = (id) => {
     navigate(`characters/${id}`);
-    //redirecciona con un id
   };
+  const handleFilter = e => {
+    setSearchValue(e.target.value);
+  };
+  const handleButton = () => {
+  queryFilter({variables: {name: searchValue}})
+  }
   return (
+<Fragment>
+  <input type={"text"} placeholder={"Buscar personaje"} onChange={handleFilter}></input>
+  <Button onClick={()=>{handleButton()}}> Buscar</Button>
     <div>
-      {loading ? (
+      {loadingQuery ? (
         <p>CARGANDO....</p>
       ) : (
         <Fragment>
-          <Button
-            onClick={() => {
-              handleButton();
-            }}
-          >
-            hola
-          </Button>
-          {data?.characters.results.map((character) => {
+          {dataQuery?.characters.results.map((character) => {
             return (
+                <div className={classes.card}>
               <Card
                 key={character.id}
-                sx={{ maxWidth: 345 }}
                 onClick={() => {
                   getCharacterInfo(character.id);
                 }}
@@ -72,16 +87,17 @@ export const Characters = () => {
                 <CardHeader title={character.name} />
                 <CardMedia
                   component="img"
-                  height="194"
                   image={character.image}
                 />
               </Card>
+                </div>
             );
           })}
-          <AppPagination page={data.characters.info.pages} setPage={setPage} />
+          <AppPagination page={dataQuery?.characters.info.pages} setPage={setPage} />
         </Fragment>
       )}
     </div>
+</Fragment>
     // <AppPagination count={data.characters.info.pages} />
   );
 };
